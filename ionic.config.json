@@ -1,0 +1,7 @@
+{
+  "name": "serverFilm",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
