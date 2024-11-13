@@ -29,6 +29,14 @@ app.get('/',(req ,res ) => {
     })
     
 });
+app.get('/atelierHack',(req,res)=>{
+
+    let sql= "select id_event_atelier, nb_participants, theme_hack, event.* from event_atelier join event on event_atelier.id_event_atelier= event.id_event join hackaton on hackaton.id = event.id_hack where";
+    connection.query(sql,function(err,resultat){
+        console.log(resultat);
+        res.json(resultat);
+    })
+});
 
 app.listen(3000, () => {
     console.log('Serveur Démarré ')
