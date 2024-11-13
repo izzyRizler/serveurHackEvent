@@ -22,7 +22,7 @@ connection.connect(function(err){
 });
 
 app.get('/',(req ,res ) => {
-    let sql ="select theme_hack, event.* from event join hackaton on event.id_hack = hackaton.id ";
+    let sql ="select hackaton.*, event.* from event join hackaton on event.id_hack = hackaton.id order by id asc ";
     connection.query(sql,function(err,resultat){
         console.log(resultat)
         res.json(resultat);
