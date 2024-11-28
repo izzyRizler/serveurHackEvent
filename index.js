@@ -20,23 +20,66 @@ connection.connect(function(err){
    if(err)throw err;
     console.log("connection ok ")
 });
+app.use(express.json())
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
 app.get('/',(req ,res ) => {
     let sql ="select hackaton.*, event.* from event join hackaton on event.id_hack = hackaton.id order by id asc ";
     connection.query(sql,function(err,resultat){
-        console.log(resultat)
+        //console.log(resultat)
         res.json(resultat);
     })
     
 });
-app.get('/atelierHack',(req,res)=>{
-
-    let sql= "select id_event_atelier, nb_participants, theme_hack, event.* from event_atelier join event on event_atelier.id_event_atelier= event.id_event join hackaton on hackaton.id = event.id_hack where";
+app.get('/atelierHack/:idhack',(req,res)=>{
+    let idhack = req.params.idhack;
+    let sql= "select id_event_atelier, nb_participants, theme_hack, event.* from event_atelier join event on event_atelier.id_event_atelier= event.id_event join hackaton on hackaton.id = event.id_hack where id_hack = "+idhack+"";
     connection.query(sql,function(err,resultat){
         console.log(resultat);
         res.json(resultat);
     })
 });
+app.post('/utilisateur', (req, res) => {
+    let sql = "INSERT INTO utilisateur (prenom_util, nom_util, mail_util) VALUES ('" 
+              + req.body.prenom + "','" 
+              + req.body.nom + "','" 
+              + req.body.email + "')";
+    
+    connection.query(sql, function(err, resultat) {
+        if (err) {
+            console.error('Erreur lors de l\'insertion dans utilisateur :', err);
+            res.status(500).json({ message: 'Erreur lors de l\'insertion.' });
+            return;
+        }
+
+        const userId = resultat.insertId;
+        res.status(201).json({ message: 'Utilisateur inséré avec succès.', id: userId });
+    });
+});
+
+app.post('/participer', (req, res) => {
+    console.log(req.body)
+    let sql = "INSERT INTO participer (id_util, id_event) VALUES ('"+req.body.id_utilisateur+"','"+req.body.id_event+"')";
+    
+    connection.query(sql, function(err, resultat) {
+        if (err) {
+            console.error('Erreur lors de l\'insertion dans participer :', err);
+            res.status(500).json({ message: 'Erreur lors de l\'insertion.' });
+            return;
+        }
+
+        res.status(201).json({ message: 'Participation insérée avec succès.' });  
+
+        
+    });
+});
+
+  
+  
 
 app.listen(3000, () => {
     console.log('Serveur Démarré ')
