@@ -28,7 +28,7 @@ app.use(function(req, res, next) {
   });
 
 app.get('/',(req ,res ) => {
-    let sql ="select hackaton.*, event.* from event join hackaton on event.id_hack = hackaton.id order by id asc ";
+    let sql ="select * from hackaton ";
     connection.query(sql,function(err,resultat){
         //console.log(resultat)
         res.json(resultat);
