@@ -28,7 +28,7 @@ app.use(function(req, res, next) {
   });
 
 app.get('/',(req ,res ) => {
-    let sql ="select * from hackaton ";
+    let sql ="select * from hackaton order by theme_hack";
     connection.query(sql,function(err,resultat){
         //console.log(resultat)
         res.json(resultat);
@@ -37,7 +37,7 @@ app.get('/',(req ,res ) => {
 });
 app.get('/atelierHack/:idhack',(req,res)=>{
     let idhack = req.params.idhack;
-    let sql= "select id_event_atelier, nb_participants, theme_hack, event.* from event_atelier join event on event_atelier.id_event_atelier= event.id_event join hackaton on hackaton.id = event.id_hack where id_hack = "+idhack+"";
+    let sql= "select event_atelier.id, nb_participants, theme_hack, event.* from event_atelier join event on event_atelier.id= event.id join hackaton on hackaton.id = event.id_hack where id_hack =  "+idhack+"";
     connection.query(sql,function(err,resultat){
         console.log(resultat);
         res.json(resultat);
