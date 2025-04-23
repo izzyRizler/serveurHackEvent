@@ -37,7 +37,7 @@ app.get('/',(req ,res ) => {
 });
 app.get('/atelierHack/:idhack',(req,res)=>{
     let idhack = req.params.idhack;
-    let sql= "select event_atelier.id, nb_participants, theme_hack, event.* from event_atelier join event on event_atelier.id= event.id join hackaton on hackaton.id = event.id_hack where id_hack =  "+idhack+"";
+    let sql= "select SUM(montant) as montantTotal, event_atelier.id, nb_participants, theme_hack, event.* from event_atelier join event on event_atelier.id= event.id join hackaton on hackaton.id = event.id_hack join participer on participer.id_event = event_atelier.id where id_hack =  "+idhack+"";
     connection.query(sql,function(err,resultat){
         console.log(resultat);
         res.json(resultat);
@@ -63,7 +63,7 @@ app.post('/utilisateur', (req, res) => {
 
 app.post('/participer', (req, res) => {
     console.log(req.body)
-    let sql = "INSERT INTO participer (id_util, id_event) VALUES ('"+req.body.id_utilisateur+"','"+req.body.id_event+"')";
+    let sql = "INSERT INTO participer (id_util, id_event, montant) VALUES ('"+req.body.id_utilisateur+"','"+req.body.id_event+"',"+req.body.montantUtil+")";
     
     connection.query(sql, function(err, resultat) {
         if (err) {
@@ -77,8 +77,29 @@ app.post('/participer', (req, res) => {
         
     });
 });
+app.post('/commentaire',(req,res)=>{
+    console.log(req.body)
+     let sql="insert into avis (id_event_atelier, avis_utilisateur, email_utilisateur) values ('"+req.body.id_event_atelier+"','"+req.body.commentaireAvis+"','"+req.body.emailAvis+"')  "
+    connection.query(sql, function(err, resultat) {
+        if (err) {
+            console.error('Erreur lors de l\'insertion dans avis :', err);
+            res.status(500).json({ message: 'Erreur lors de l\'insertion.' });
+            return;
+        }
 
-  
+        res.status(201).json({ message: 'Avis inséré avec succès.' });  
+    }); 
+
+});
+app.get('/commentaireAtelier/:id_event_atelier',(req,res)=>{
+    let idEventAtelier = req.params.id_event_atelier;
+    let sql = "select avis.id_event_atelier, avis_utilisateur, email_utilisateur from avis join event_atelier on avis.id_event_atelier = event_atelier.id where avis.id_event_atelier ="+idEventAtelier+" ";
+    connection.query(sql,function(err,resultat){
+        console.log(resultat);
+        res.json(resultat);
+    });
+})
+
   
 
 app.listen(3000, () => {
